@@ -14,6 +14,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import timedelta
 import secrets
 import os
+
 print(os.getcwd())
 import firebase_admin 
 from firebase_admin import credentials, messaging
@@ -36,6 +37,7 @@ except Exception as e:
 
 
 app = Flask(__name__)
+
 
 cred = credentials.Certificate("firebase-key.json")
 firebase_admin.initialize_app(cred)
