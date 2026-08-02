@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Meal Entry</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+
+    <style>
+        body {
+            background: #f4f7fb;
+        }
+
+        .topbar {
+            background: linear-gradient(135deg, #fd7e14, #198754);
+            color: white;
+            padding: 20px;
+            border-radius: 0 0 20px 20px;
+        }
+
+        .menu {
+            margin-top: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .menu .btn {
+            border-radius: 25px;
+            font-weight: 600;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+        }
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <div class="topbar">
+
+        <h3>
+            🍽 Meal Entry
+        </h3>
+
+        <p>
+            ENGINEERS ROOM
+        </p>
+
+
+        <div class="menu">
+
+            <a href="/dashboard" class="btn btn-light">
+                🏠 Dashboard
+            </a>
+
+
+            {% if role=="admin" %}
+
+            <a href="/members" class="btn btn-light">
+                👥 Members
+            </a>
+
+            {% endif %}
+
+
+            <a href="/payment" class="btn btn-light">
+                💰 Payment
+            </a>
+
+
+            <a href="/meal" class="btn btn-warning">
+                🍽 Meal
+            </a>
+
+
+            <a href="/summary" class="btn btn-light">
+                📊 Summary
+            </a>
+
+
+        </div>
+
+
+    </div>
+
+
+
+
+
+    <div class="container py-4">
+
+
+
+        <!-- Add Meal -->
+
+
+        <div class="card shadow mb-4">
+
+
+            <div class="card-body">
+
+
+                <h3>
+                    🍽 Add Meal
+                </h3>
+
+
+
+                <form method="POST">
+
+
+
+                    {% if role=="admin" %}
+
+
+                    <div class="mb-3">
+
+                        <label>
+                            Select Member
+                        </label>
+
+
+                        <select name="member_id" class="form-select">
+
+
+                            {% for member in members %}
+
+
+                            <option value="{{member.id}}">
+                                {{member.name}}
+                            </option>
+
+
+                            {% endfor %}
+
+
+                        </select>
+
+
+                    </div>
+
+
+                    {% else %}
+
+
+                    <input type="hidden" name="member_id" value="{{session['user_id']}}">
+
+
+                    {% endif %}
+
+
+
+
+
+                    <div class="mb-3">
+
+                        <label>
+                            Morning Meal
+                        </label>
+
+
+                        <input type="number" name="morning" class="form-control" value="0" min="0">
+
+                    </div>
+
+
+
+
+                    <div class="mb-3">
+
+                        <label>
+                            Night Meal
+                        </label>
+
+
+                        <input type="number" name="night" class="form-control" value="0" min="0">
+
+                    </div>
+
+
+
+
+                    <div class="mb-3">
+
+                        <label>
+                            Date
+                        </label>
+
+
+                        <input type="date" name="date" class="form-control" required>
+
+                    </div>
+
+
+
+
+                    <button class="btn btn-success w-100">
+
+                        ➕ Add Meal
+
+                    </button>
+
+
+
+                </form>
+
+
+            </div>
+
+
+        </div>
+
+
+
+
+
+
+
+        <!-- Meal History -->
+
+
+        <div class="card shadow">
+
+
+            <div class="card-body">
+
+
+                <h4>
+                    📜 Meal History
+                </h4>
+
+
+
+                <div class="table-responsive">
+
+
+                    <table class="table table-hover">
+
+
+                        <thead class="table-warning">
+
+
+                            <tr>
+
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Morning</th>
+                                <th>Night</th>
+                                <th>Date</th>
+                                <th>Action</th>
+
+                            </tr>
+
+
+                        </thead>
+
+
+
+                        <tbody>
+
+
+                            {% for meal in meals %}
+
+
+                            <tr>
+
+
+                                <td>
+                                    {{meal.id}}
+                                </td>
+
+
+                                <td>
+                                    <strong>{{meal.name}}</strong>
+                                </td>
+
+
+                                <td>
+                                    <span class="badge bg-primary">
+                                        {{meal.morning}}
+                                    </span>
+                                </td>
+
+
+                                <td>
+                                    <span class="badge bg-dark">
+                                        {{meal.night}}
+                                    </span>
+                                </td>
+
+
+                                <td>
+                                    {{meal.date}}
+                                </td>
+
+
+
+                                <td>
+
+
+                                    {% if role=="admin" %}
+
+
+                                    <a href="/edit_meal/{{meal.id}}" class="btn btn-warning btn-sm">
+
+                                        ✏️ Edit
+
+                                    </a>
+
+
+                                    <a href="/delete_meal/{{meal.id}}" class="btn btn-danger btn-sm"
+                                        onclick="return confirm('Delete meal?')">
+
+                                        🗑 Delete
+
+                                    </a>
+
+
+                                    {% else %}
+
+
+                                    <span class="badge bg-secondary">
+                                        View Only
+                                    </span>
+
+
+                                    {% endif %}
+
+
+
+                                </td>
+
+
+                            </tr>
+
+
+                            {% endfor %}
+
+
+                        </tbody>
+
+
+                    </table>
+
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+
+    </div>
+
+
+</body>
+
+</html>

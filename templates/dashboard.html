@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>ENGINEERS ROOM</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: #f4f7fb;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .topbar {
+            background: linear-gradient(135deg, #0d6efd, #0a58ca);
+            color: white;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, .15);
+            padding: 18px;
+        }
+
+        .topbar h3 {
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .topbar p {
+            margin: 0;
+            opacity: .9;
+            font-size: 14px;
+        }
+
+        .menu {
+            margin-top: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .menu .btn {
+            border-radius: 30px;
+            font-weight: 600;
+            padding: 7px 16px;
+        }
+
+        .page-body {
+            padding: 15px;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="topbar">
+
+        <h3>🏠 ENGINEERS ROOM</h3>
+        <p>Mess Management System</p>
+
+        <div class="menu">
+
+            <a href="/dashboard" class="btn btn-light">🏠 Dashboard</a>
+
+            {% if role == "admin" %}
+
+            <a href="/members" class="btn btn-light">👥 Members</a>
+            <a href="/payment" class="btn btn-light">💰 Payment</a>
+            <a href="/meal" class="btn btn-light">🍽 Meal Manage</a>
+
+            {% elif role == "member" %}
+
+            <a href="#meal-entry" class="btn btn-success">🍽 My Meal Entry</a>
+
+            {% endif %}
+
+            <a href="/summary" class="btn btn-warning">📊 Summary</a>
+
+            <a href="/logout" class="btn btn-danger">🚪 Logout</a>
+
+        </div>
+
+    </div>
+
+
+    <div class="container page-body">
+
+
+        <div class="container page-body">
+
+            <!-- Banner -->
+            <div class="card border-0 shadow mb-4">
+
+                <img src="{{ url_for('static', filename='banner.png') }}" class="card-img-top"
+                    style="height:160px;object-fit:cover;">
+
+            </div>
+
+
+            <!-- Notice -->
+
+            <div class="card border-0 shadow mb-4">
+
+                <div class="card-body text-center">
+
+                    <h5 class="text-primary mb-2">
+                        📢 Notice Board
+                    </h5>
+
+                    <p class="mb-0 fw-bold">
+                        {{ notice }}
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            {% if role == "admin" %}
+
+            <div class="card border-0 shadow mb-4">
+
+                <div class="card-body">
+
+                    <h5 class="mb-3">
+                        ✏️ Update Notice
+                    </h5>
+
+
+                    <form method="POST" action="/update_notice">
+
+
+                        <textarea name="notice" class="form-control mb-3" rows="3" required>{{ notice }}</textarea>
+
+
+                        <button class="btn btn-primary w-100">
+                            Update Notice
+                        </button>
+
+
+                    </form>
+
+
+                </div>
+
+            </div>
+
+            {% endif %}
+
+
+
+            <!-- Statistics -->
+
+            <div class="row g-3">
+
+
+                <div class="col-6">
+
+                    <div class="card border-0 shadow text-center">
+
+                        <div class="card-body">
+
+                            <h6 class="text-muted">
+                                👥 Members
+                            </h6>
+
+                            <h2 class="text-primary">
+                                {{ total_members }}
+                            </h2>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="col-6">
+
+                    <div class="card border-0 shadow text-center">
+
+                        <div class="card-body">
+
+                            <h6 class="text-muted">
+                                🍽 Meals
+                            </h6>
+
+                            <h2 class="text-success">
+                                {{ today_meals }}
+                            </h2>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="col-6">
+                    <div class="card border-0 shadow text-center">
+                        <div class="card-body">
+                            <h6 class="text-muted">💰 Payment</h6>
+                            <h2 class="text-warning">৳ {{ total_payment }}</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-6">
+                    <div class="card border-0 shadow text-center">
+                        <div class="card-body">
+                            <h6 class="text-muted">📅 Today</h6>
+                            <h5>{{ today }}</h5>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- Today's Meal -->
+            <div class="card border-0 shadow mt-4">
+
+                <div class="card-body">
+
+                    <h5 class="text-center mb-4">
+                        🍽 Today's Meal Status
+                    </h5>
+
+                    <div class="row text-center">
+
+                        <div class="col-6">
+                            <div class="bg-light rounded p-3">
+                                <h6>☀️ Day Meal</h6>
+                                <h2 class="text-primary">
+                                    {{ today_morning }}
+                                </h2>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="bg-light rounded p-3">
+                                <h6>🌙 Night Meal</h6>
+                                <h2 class="text-dark">
+                                    {{ today_night }}
+                                </h2>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            {% if role == "admin" %}
+
+            <div class="card border-0 shadow mt-4">
+
+                <div class="card-body">
+
+                    <h5 class="mb-3">
+                        ⚡ Quick Actions
+                    </h5>
+
+                    <div class="d-grid gap-2">
+
+                        <a href="/members" class="btn btn-primary">
+                            👥 Members
+                        </a>
+
+                        <a href="/payment" class="btn btn-success">
+                            💰 Payment
+                        </a>
+
+                        <a href="/meal" class="btn btn-warning">
+                            🍽 Meal
+                        </a>
+
+                        <a href="/summary" class="btn btn-info text-white">
+                            📊 Summary
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endif %}
+
+
+
+            {% if role == "member" %}
+
+            <div class="card shadow mt-4">
+
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">
+                        🍽 Add Today's Meal
+                    </h4>
+                </div>
+
+                <div class="card-body">
+
+                    <form method="POST" action="/member">
+
+                        <label>Morning Meal</label>
+
+                        <input type="number" name="morning" class="form-control mb-3" value="0" min="0">
+
+
+                        <label>Night Meal</label>
+
+                        <input type="number" name="night" class="form-control mb-3" value="0" min="0">
+
+
+                        <input type="date" name="date" class="form-control mb-3" required>
+
+
+                        <button class="btn btn-success w-100">
+                            Add Meal
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+            {% endif %}
+
+
+
+            <div class="card border-0 shadow mt-4">
+
+                <div class="card-body text-center">
+
+                    <h3>👋 Welcome</h3>
+
+                    <h4 class="fw-bold text-primary">
+                        ENGINEERS ROOM
+                    </h4>
+
+                    <p class="text-muted">
+                        Smart Mess Management System
+                    </p>
+
+                    <span class="badge bg-primary fs-6">
+                        📅 {{ today }}
+                    </span>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="card border-0 shadow mt-4 mb-4">
+
+                <div class="card-body">
+
+                    <h4 class="text-center mb-4">
+                        🍽 Today's Meal Entry Status
+                    </h4>
+
+
+                    <div class="row">
+
+
+                        <div class="col-6">
+
+                            <div class="card bg-success text-white border-0">
+
+                                <div class="card-body text-center">
+
+                                    <h6>🌅 Morning Done</h6>
+
+                                    <h2>{{ morning_done }}</h2>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <div class="col-6">
+
+                            <div class="card bg-danger text-white border-0">
+
+                                <div class="card-body text-center">
+
+                                    <h6>🌅 Morning Pending</h6>
+
+                                    <h2>{{ morning_pending }}</h2>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <div class="row mt-3">
+
+
+                        <div class="col-6">
+
+                            <div class="card bg-primary text-white border-0">
+
+                                <div class="card-body text-center">
+
+                                    <h6>🌙 Night Done</h6>
+
+                                    <h2>{{ night_done }}</h2>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <div class="col-6">
+
+                            <div class="card bg-warning border-0">
+
+                                <div class="card-body text-center">
+
+                                    <h6>🌙 Night Pending</h6>
+
+                                    <h2>{{ night_pending }}</h2>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+            </div>
