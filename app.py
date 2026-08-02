@@ -31,8 +31,12 @@ except Exception as e:
 
 app = Flask(__name__)
 
-cred = credentials.Certificate("firebase-key.json")
-firebase_admin.initialize_app(cred)
+if os.path.exists("firebase-key.json"):
+    cred = credentials.Certificate("firebase-key.json")
+    firebase_admin.initialize_app(cred)
+    print("Firebase Initialized")
+else:
+    print("firebase-key.json not found. Firebase Disabled.")
 
 app.secret_key = "engineers_room_secret_key_123"
 
@@ -43,6 +47,20 @@ app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 
 BOT_TOKEN = "8889835818:AAGAL-r8TBxB6raO2Y08Qy-XZXtR-1vUL7s"
+CHAT_ID = "7534627531"
+
+
+def send_message(chat_id, text):
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+
+    data = {
+        "chat_id": chat_id,
+        "text": text
+    }
+
+    requests.post(url, data=data)
+
+
 def send_daily_reminder():
     members = supabase.table("telegram_members").select("chat_id").execute()
 
@@ -64,7 +82,7 @@ def send_daily_reminder():
         )
 
     print("Daily reminder sent.")
-    
+
 
 scheduler = BackgroundScheduler()
 
@@ -75,20 +93,8 @@ scheduler.add_job(
     minute=0,
     timezone="Asia/Dhaka"
 )
+
 scheduler.start()
-BOT_TOKEN = "8889835818:AAGAL-r8TBxB6raO2Y08Qy-XZXtR-1vUL7s"
-CHAT_ID = "7534627531"
-
-
-def send_message(chat_id, text):
-    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-
-    data = {
-        "chat_id": chat_id,
-        "text": text
-    }
-
-    requests.post(url, data=data)
 
 
 def send_telegram_message(text):
@@ -105,7 +111,6 @@ def send_telegram_message(text):
 def init_db():
     # Supabase handles database tables now
     pass
-
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
