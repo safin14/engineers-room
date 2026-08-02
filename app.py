@@ -13,19 +13,15 @@ import requests
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import timedelta
 import secrets
-import os
+import firebase_admin
+from firebase_admin import credentials, messaging
 
 print(os.getcwd())
-import firebase_admin 
-from firebase_admin import credentials, messaging
-from dotenv import load_dotenv
-load_dotenv()
 
+SUPABASE_URL = "https://cxnnikxpljcatpxmifoa.supabase.co"
+SUPABASE_KEY = "sb_publishable_gPPDgfTthPSdnV70yHpwDw_9iDmTEPg"
 
-supabase = create_client(
-    os.environ.get("SUPABASE_URL"),
-    os.environ.get("SUPABASE_KEY")
-)
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 try:
     test = supabase.table("users").select("*").limit(1).execute()
@@ -33,41 +29,20 @@ try:
 except Exception as e:
     print("Supabase Error:", e)
 
-
-
-
 app = Flask(__name__)
-
 
 cred = credentials.Certificate("firebase-key.json")
 firebase_admin.initialize_app(cred)
 
 app.secret_key = "engineers_room_secret_key_123"
 
-
-
 app.permanent_session_lifetime = timedelta(days=30)
-
 
 app.config["SESSION_COOKIE_SECURE"] = False
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 
-import requests
-
 BOT_TOKEN = "8889835818:AAGAL-r8TBxB6raO2Y08Qy-XZXtR-1vUL7s"
-
-def send_message(chat_id, text):
-    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-
-    data = {
-        "chat_id": chat_id,
-        "text": text
-    }
-
-    requests.post(url, data=data)
-
-
 def send_daily_reminder():
     members = supabase.table("telegram_members").select("chat_id").execute()
 
@@ -101,27 +76,36 @@ scheduler.add_job(
     timezone="Asia/Dhaka"
 )
 scheduler.start()
-
 BOT_TOKEN = "8889835818:AAGAL-r8TBxB6raO2Y08Qy-XZXtR-1vUL7s"
 CHAT_ID = "7534627531"
 
-SUPABASE_URL = "https://cxnnikxpljcatpxmifoa.supabase.co"
-SUPABASE_KEY = "sb_publishable_gPPDgfTthPSdnV70yHpwDw_9iDmTEPg"
 
-supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+def send_message(chat_id, text):
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+
+    data = {
+        "chat_id": chat_id,
+        "text": text
+    }
+
+    requests.post(url, data=data)
 
 
 def send_telegram_message(text):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+
     data = {
         "chat_id": CHAT_ID,
         "text": text
     }
+
     requests.post(url, data=data)
+
 
 def init_db():
     # Supabase handles database tables now
     pass
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -131,21 +115,17 @@ def login():
         username = request.form["username"]
         password = request.form["password"]
 
-
         response = supabase.table("users")\
             .select("*")\
             .eq("name", username)\
             .eq("password", password)\
             .execute()
 
-
         user = response.data[0] if response.data else None
-
 
         if user:
 
             token = secrets.token_hex(32)
-
 
             supabase.table("users")\
                 .update({
@@ -154,22 +134,16 @@ def login():
                 .eq("id", user["id"])\
                 .execute()
 
-
             session.permanent = True
             session["user_id"] = user["id"]
             session["role"] = user["role"]
 
-
             print("Login Token:", token)
-
 
             return redirect("/dashboard")
 
-
         else:
-
             return "Wrong Username or Password"
-
 
     return render_template("login.html")
 
